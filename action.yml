@@ -1,0 +1,57 @@
+name: 'composite-azure-deploy-functionapp'
+description: 'Render variables, substitute variables and deploy to Azure Function App'
+inputs:
+  publishPath:
+    description: 'publishing path of the binaries'
+    required: true
+  environment: 
+    description: 'Target environment to deploy to'
+    required: true
+  variableFile: 
+    description: 'json file with variables for rendering with json-variables'
+    required: true
+  secrets:
+    description: 'serialized json string for github secrets'
+    required: true
+  configurationFile:
+    description: 'configuration file to perform variable substitution'
+    required: true
+  functionAppName:
+    description: 'Name of the target function app'
+    required: true
+  azureCredentials: 
+    description: 'Service principal credentials'
+    required: true
+  
+  
+outputs:
+  random-number:
+    description: "Random number"
+    value: ${{ steps.random-number-generator.outputs.random-id }}
+    
+runs:
+  using: "composite"
+  steps:
+      - name: Set environment specific variables
+        uses: jnus/json-variables@4d729bb7248e73b81440da6bee6824e6102d775c
+        with:
+          scope: ${{inputs.environment}}
+          configFile: '${{inputs.variableFile}}'
+          secrets: '${{ inputs.secrets }}'
+
+      - name: App Settings Variable Substitution
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: '${{inputs.configurationFile}}'
+
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ inputs.azureCredentials }}
+
+      - name: Deploy to Azure Function App
+        uses: Azure/functions-action@v1
+        id: webApp
+        with:
+          app-name: ${{inputs.functionAppName}}
+          package: ${{inputs.publishPath}}
