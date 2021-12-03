@@ -10,7 +10,7 @@ This a composite action wrapping the following functionality
 
 Reference the composite action with a full sha like the following to avoid breaking changes in the repo:
 ```yaml
-segesdk/composite-azure-deploy-functionapp@<INSERT SHA>
+segesdk/composite-azure-deploy-functionapp@58eb0256114c74829fc7badb15dc6945f82dd71b
 ```
 or like the following, to always use latest version by referencing @main
 
