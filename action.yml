@@ -21,9 +21,8 @@ inputs:
     required: true
   azureCredentials: 
     description: 'Service principal credentials'
-    required: true
-  
-  
+    required: false
+ 
 outputs:
   random-number:
     description: "Random number"
@@ -45,6 +44,7 @@ runs:
           files: '${{inputs.configurationFile}}'
 
       - name: Azure login
+        if: inputs.azureCredentials != null 
         uses: azure/login@v1
         with:
           creds: ${{ inputs.azureCredentials }}
@@ -53,5 +53,5 @@ runs:
         uses: Azure/functions-action@v1
         id: webApp
         with:
-          app-name: ${{inputs.functionAppName}}
-          package: ${{inputs.publishPath}}
+          app-name: ${{ inputs.functionAppName }}
+          package: ${{ inputs.publishPath }}
